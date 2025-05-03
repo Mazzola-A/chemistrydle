@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Elemento Químico do Dia</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        .main-content {
+            text-align: center;
+        }
+
+        #gamePanel, #historico, #instructionsPanel {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        #historico {
+            width: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        #instructionsPanel {
+            width: 250px;
+            text-align: left;
+        }
+        
+        input {
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            margin: 10px;
+            width: 200px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+
+        .elemento {
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 4px;
+            min-height: 35px;
+        }
+
+        .historico-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔬 Elemento Químico do Dia</h1>
+    
+    <div class="container">
+        <div id="instructionsPanel">
+            <h2>📋 Instruções</h2>
+            <p>Digite um elemento até acertar, quando acertar ele mudará e você terá que acertar de novo. Jogue bastante e fique craque na tabela periódica!!!
+                (lembrando que o elemento tem que ser escrito pelo simbolo, por exemplo: H para Hidrogênio)</p>
+            </p>
+        </div>
+        <div class="main-content">
+            <div id="gamePanel">
+                <input type="text" id="elementoInput" placeholder="Digite o símbolo">
+                <button onclick="iniciarJogo()">Enviar</button>
+                <div id="resultado"></div>
+                <div id="errorMessage" class="error"></div>
+            </div>
+            
+            
+        </div>
+
+        <div id="historico">
+            <h2>📝 Tentativas</h2>
+            <div id="historicoLista"></div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de dados completo com todos os 118 elementos
+        const elementos = {
+            "H": { nome: "Hidrogênio", grupo: "1", periodo: "1", familia: "Não metal", eletronegatividade: 2.20, Natomico: 1 },
+            "He": { nome: "Hélio", grupo: "18", periodo: "1", familia: "Gás nobre", eletronegatividade: null, Natomico: 2 },
+            "Li": { nome: "Lítio", grupo: "1", periodo: "2", familia: "Metal alcalino", eletronegatividade: 0.98, Natomico: 3 },
+            "Be": { nome: "Berílio", grupo: "2", periodo: "2", familia: "Metal alcalino-terroso", eletronegatividade: 1.57, Natomico: 4 },
+            "B": { nome: "Boro", grupo: "13", periodo: "2", familia: "Semimetal", eletronegatividade: 2.04, Natomico: 5 },
+            "C": { nome: "Carbono", grupo: "14", periodo: "2", familia: "Não metal", eletronegatividade: 2.55, Natomico: 6 },
+            "N": { nome: "Nitrogênio", grupo: "15", periodo: "2", familia: "Não metal", eletronegatividade: 3.04, Natomico: 7 },
+            "O": { nome: "Oxigênio", grupo: "16", periodo: "2", familia: "Não metal", eletronegatividade: 3.44, Natomico: 8 },
+            "F": { nome: "Flúor", grupo: "17", periodo: "2", familia: "Halogênio", eletronegatividade: 3.98, Natomico: 9 },
+            "Ne": { nome: "Neônio", grupo: "18", periodo: "2", familia: "Gás nobre", eletronegatividade: null, Natomico: 10 },
+            "Na": { nome: "Sódio", grupo: "1", periodo: "3", familia: "Metal alcalino", eletronegatividade: 0.93, Natomico: 11 },
+            "Mg": { nome: "Magnésio", grupo: "2", periodo: "3", familia: "Metal alcalino-terroso", eletronegatividade: 1.31, Natomico: 12 },
+            "Al": { nome: "Alumínio", grupo: "13", periodo: "3", familia: "Metal", eletronegatividade: 1.61, Natomico: 13 },
+            "Si": { nome: "Silício", grupo: "14", periodo: "3", familia: "Semimetal", eletronegatividade: 1.90, Natomico: 14 },
+            "P": { nome: "Fósforo", grupo: "15", periodo: "3", familia: "Não metal", eletronegatividade: 2.19, Natomico: 15 },
+            "S": { nome: "Enxofre", grupo: "16", periodo: "3", familia: "Não metal", eletronegatividade: 2.58, Natomico: 16 },
+            "Cl": { nome: "Cloro", grupo: "17", periodo: "3", familia: "Halogênio", eletronegatividade: 3.16, Natomico: 17 },
+            "Ar": { nome: "Argônio", grupo: "18", periodo: "3", familia: "Gás nobre", eletronegatividade: null, Natomico: 18 },
+            "K": { nome: "Potássio", grupo: "1", periodo: "4", familia: "Metal alcalino", eletronegatividade: 0.82, Natomico: 19 },
+            "Ca": { nome: "Cálcio", grupo: "2", periodo: "4", familia: "Metal alcalino-terroso", eletronegatividade: 1.00, Natomico: 20 },
+            "Sc": { nome: "Escândio", grupo: "3", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.36, Natomico: 21 },
+            "Ti": { nome: "Titânio", grupo: "4", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.54, Natomico: 22 },
+            "V": { nome: "Vanádio", grupo: "5", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.63, Natomico: 23 },
+            "Cr": { nome: "Cromo", grupo: "6", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.66, Natomico: 24 },
+            "Mn": { nome: "Manganês", grupo: "7", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.55, Natomico: 25 },
+            "Fe": { nome: "Ferro", grupo: "8", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.83, Natomico: 26 },
+            "Co": { nome: "Cobalto", grupo: "9", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.88, Natomico: 27 },
+            "Ni": { nome: "Níquel", grupo: "10", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.91, Natomico: 28 },
+            "Cu": { nome: "Cobre", grupo: "11", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.90, Natomico: 29 },
+            "Zn": { nome: "Zinco", grupo: "12", periodo: "4", familia: "Metal de transição", eletronegatividade: 1.65, Natomico: 30 },
+            "Ga": { nome: "Gálio", grupo: "13", periodo: "4", familia: "Metal pós-transição", eletronegatividade: 1.81, Natomico: 31 },
+            "Ge": { nome: "Germânio", grupo: "14", periodo: "4", familia: "Semimetal", eletronegatividade: 2.01, Natomico: 32 },
+            "As": { nome: "Arsênio", grupo: "15", periodo: "4", familia: "Semimetal", eletronegatividade: 2.18, Natomico: 33 },
+            "Se": { nome: "Selênio", grupo: "16", periodo: "4", familia: "Não metal", eletronegatividade: 2.55, Natomico: 34 },
+            "Br": { nome: "Bromo", grupo: "17", periodo: "4", familia: "Halogênio", eletronegatividade: 2.96, Natomico: 35 },
+            "Kr": { nome: "Criptônio", grupo: "18", periodo: "4", familia: "Gás nobre", eletronegatividade: 3.00, Natomico: 36 },
+            "Rb": { nome: "Rubídio", grupo: "1", periodo: "5", familia: "Metal alcalino", eletronegatividade: 0.82, Natomico: 37 },
+            "Sr": { nome: "Estrôncio", grupo: "2", periodo: "5", familia: "Metal alcalino-terroso", eletronegatividade: 0.95, Natomico: 38 },
+            "Y": { nome: "Ítrio", grupo: "3", periodo: "5", familia: "Metal de transição", eletronegatividade: 1.22, Natomico: 39 },
+            "Zr": { nome: "Zircônio", grupo: "4", periodo: "5", familia: "Metal de transição", eletronegatividade: 1.33, Natomico: 40 },
+            "Nb": { nome: "Nióbio", grupo: "5", periodo: "5", familia: "Metal de transição", eletronegatividade: 1.60, Natomico: 41 },
+            "Mo": { nome: "Molibdênio", grupo: "6", periodo: "5", familia: "Metal de transição", eletronegatividade: 2.16, Natomico: 42 },
+            "Tc": { nome: "Tecnécio", grupo: "7", periodo: "5", familia: "Metal de transição", eletronegatividade: 1.90, Natomico: 43 },
+            "Ru": { nome: "Rutênio", grupo: "8", periodo: "5", familia: "Metal de transição", eletronegatividade: 2.20, Natomico: 44 },
+            "Rh": { nome: "Ródio", grupo: "9", periodo: "5", familia: "Metal de transição", eletronegatividade: 2.28, Natomico: 45 },
+            "Pd": { nome: "Paládio", grupo: "10", periodo: "5", familia: "Metal de transição", eletronegatividade: 2.20, Natomico: 46 },
+            "Ag": { nome: "Prata", grupo: "11", periodo: "5", familia: "Metal de transição", eletronegatividade: 1.93, Natomico: 47 },
+            "Cd": { nome: "Cádmio", grupo: "12", periodo: "5", familia: "Metal de transição", eletronegatividade: 1.69, Natomico: 48 },
+            "In": { nome: "Índio", grupo: "13", periodo: "5", familia: "Metal pós-transição", eletronegatividade: 1.78, Natomico: 49 },
+            "Sn": { nome: "Estanho", grupo: "14", periodo: "5", familia: "Metal pós-transição", eletronegatividade: 1.96, Natomico: 50 },
+            "Sb": { nome: "Antimônio", grupo: "15", periodo: "5", familia: "Semimetal", eletronegatividade: 2.05, Natomico: 51 },
+            "Te": { nome: "Telúrio", grupo: "16", periodo: "5", familia: "Semimetal", eletronegatividade: 2.10, Natomico: 52 },
+            "I": { nome: "Iodo", grupo: "17", periodo: "5", familia: "Halogênio", eletronegatividade: 2.66, Natomico: 53 },
+            "Xe": { nome: "Xenônio", grupo: "18", periodo: "5", familia: "Gás nobre", eletronegatividade: 2.60, Natomico: 54 },
+            "Cs": { nome: "Césio", grupo: "1", periodo: "6", familia: "Metal alcalino", eletronegatividade: 0.79, Natomico: 55 },
+            "Ba": { nome: "Bário", grupo: "2", periodo: "6", familia: "Metal alcalino-terroso", eletronegatividade: 0.89, Natomico: 56 },
+            "La": { nome: "Lantânio", grupo: "3", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.10, Natomico: 57 },
+            "Ce": { nome: "Cério", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.12, Natomico: 58 },
+            "Pr": { nome: "Praseodímio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.13, Natomico: 59 },
+            "Nd": { nome: "Neodímio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.14, Natomico: 60 },
+            "Pm": { nome: "Promécio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.13, Natomico: 61 },
+            "Sm": { nome: "Samário", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.17, Natomico: 62 },
+            "Eu": { nome: "Európio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.20, Natomico: 63 },
+            "Gd": { nome: "Gadolínio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.20, Natomico: 64 },
+            "Tb": { nome: "Térbio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.22, Natomico: 65 },
+            "Dy": { nome: "Disprósio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.23, Natomico: 66 },
+            "Ho": { nome: "Hólmio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.24, Natomico: 67 },
+            "Er": { nome: "Érbio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.24, Natomico: 68 },
+            "Tm": { nome: "Túlio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.25, Natomico: 69 },
+            "Yb": { nome: "Itérbio", grupo: "-", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.10, Natomico: 70 },
+            "Lu": { nome: "Lutécio", grupo: "3", periodo: "6", familia: "Lantanídeo", eletronegatividade: 1.27, Natomico: 71 },
+            "Hf": { nome: "Háfnio", grupo: "4", periodo: "6", familia: "Metal de transição", eletronegatividade: 1.30, Natomico: 72 },
+            "Ta": { nome: "Tântalo", grupo: "5", periodo: "6", familia: "Metal de transição", eletronegatividade: 1.50, Natomico: 73 },
+            "W": { nome: "Tungstênio", grupo: "6", periodo: "6", familia: "Metal de transição", eletronegatividade: 2.36, Natomico: 74 },
+            "Re": { nome: "Rênio", grupo: "7", periodo: "6", familia: "Metal de transição", eletronegatividade: 1.90, Natomico: 75 },
+            "Os": { nome: "Ósmio", grupo: "8", periodo: "6", familia: "Metal de transição", eletronegatividade: 2.20, Natomico: 76 },
+            "Ir": { nome: "Irídio", grupo: "9", periodo: "6", familia: "Metal de transição", eletronegatividade: 2.20, Natomico: 77 },
+            "Pt": { nome: "Platina", grupo: "10", periodo: "6", familia: "Metal de transição", eletronegatividade: 2.28, Natomico: 78 },
+            "Au": { nome: "Ouro", grupo: "11", periodo: "6", familia: "Metal de transição", eletronegatividade: 2.54, Natomico: 79 },
+            "Hg": { nome: "Mercúrio", grupo: "12", periodo: "6", familia: "Metal de transição", eletronegatividade: 2.00, Natomico: 80 },
+            "Tl": { nome: "Tálio", grupo: "13", periodo: "6", familia: "Metal pós-transição", eletronegatividade: 1.62, Natomico: 81 },
+            "Pb": { nome: "Chumbo", grupo: "14", periodo: "6", familia: "Metal pós-transição", eletronegatividade: 2.33, Natomico: 82 },
+            "Bi": { nome: "Bismuto", grupo: "15", periodo: "6", familia: "Metal pós-transição", eletronegatividade: 2.02, Natomico: 83 },
+            "Po": { nome: "Polônio", grupo: "16", periodo: "6", familia: "Semimetal", eletronegatividade: 2.00, Natomico: 84 },
+            "At": { nome: "Astato", grupo: "17", periodo: "6", familia: "Halogênio", eletronegatividade: 2.20, Natomico: 85 },
+            "Rn": { nome: "Radônio", grupo: "18", periodo: "6", familia: "Gás nobre", eletronegatividade: null, Natomico: 86 },
+            "Fr": { nome: "Frâncio", grupo: "1", periodo: "7", familia: "Metal alcalino", eletronegatividade: 0.70, Natomico: 87 },
+            "Ra": { nome: "Rádio", grupo: "2", periodo: "7", familia: "Metal alcalino-terroso", eletronegatividade: 0.90, Natomico: 88 },
+            "Ac": { nome: "Actínio", grupo: "3", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.10, Natomico: 89 },
+            "Th": { nome: "Tório", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 90 },
+            "Pa": { nome: "Protactínio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.50, Natomico: 91 },
+            "U": { nome: "Urânio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.38, Natomico: 92 },
+            "Np": { nome: "Netúnio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.36, Natomico: 93 },
+            "Pu": { nome: "Plutônio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.28, Natomico: 94 },
+            "Am": { nome: "Amerício", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 95 },
+            "Cm": { nome: "Cúrio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 96 },
+            "Bk": { nome: "Berquélio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 97 },
+            "Cf": { nome: "Califórnio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 98 },
+            "Es": { nome: "Einstênio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 99 },
+            "Fm": { nome: "Férmio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 100 },
+            "Md": { nome: "Mendelévio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 101 },
+            "No": { nome: "Nobélio", grupo: "-", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 102 },
+            "Lr": { nome: "Laurêncio", grupo: "3", periodo: "7", familia: "Actinídeo", eletronegatividade: 1.30, Natomico: 103 },
+            "Rf": { nome: "Rutherfórdio", grupo: "4", periodo: "7", familia: "Metal de transição", eletronegatividade: null, Natomico: 104 },
+            "Db": { nome: "Dúbnio", grupo: "5", periodo: "7", familia: "Metal de transição", eletronegatividade: null, Natomico: 105 },
+            "Sg": { nome: "Seabórgio", grupo: "6", periodo: "7", familia: "Metal de transição", eletronegatividade: null, Natomico: 106 },
+            "Bh": { nome: "Bóhrio", grupo: "7", periodo: "7", familia: "Metal de transição", eletronegatividade: null, Natomico: 107 },
+            "Hs": { nome: "Hássio", grupo: "8", periodo: "7", familia: "Metal de transição", eletronegatividade: null, Natomico: 108 },
+            "Og": { nome: "Oganessônio", grupo: "18", periodo: "7", familia: "Gás nobre", eletronegatividade: null, Natomico: 118 }
+        };
+
+        // Funções auxiliares
+        function formatarSimbolo(simbolo) {
+            return simbolo.charAt(0).toUpperCase() + simbolo.slice(1).toLowerCase();
+        }
+
+        function obterElementoDiario() {
+    const salvo = localStorage.getItem('elementoDiario');
+    
+    // Se existir um elemento salvo, retorna ele
+    if (salvo) {
+        return JSON.parse(salvo).elemento;
+    }
+    
+    // Se não houver elemento salvo, cria um novo
+    const chaves = Object.keys(elementos);
+    const novoElemento = chaves[Math.floor(Math.random() * chaves.length)];
+    localStorage.setItem('elementoDiario', JSON.stringify({
+        elemento: novoElemento,
+        timestamp: Date.now()
+    }));
+    
+    return novoElemento;
+}
+
+function gerarNovoElemento() {
+    const chaves = Object.keys(elementos);
+    const novoElemento = chaves[Math.floor(Math.random() * chaves.length)];
+    localStorage.setItem('elementoDiario', JSON.stringify({
+        elemento: novoElemento,
+        timestamp: Date.now()
+    }));
+}
+
+function compararNumeros(chute, correto) {
+    if (chute === correto) {
+        return "✅ Igual";
+    }
+    return chute > correto ? "⬇️ Menor" : "⬆️ Maior";
+}
+
+        // Histórico
+        function atualizarHistorico(elemento, comparacoes) {
+            let historico = JSON.parse(localStorage.getItem('historico') || '[]');
+            historico.push({
+                elemento: elemento.nome,
+                comparacoes: comparacoes
+            });
+            localStorage.setItem('historico', JSON.stringify(historico.slice(-5)));
+            exibirHistorico();
+        }
+
+        function exibirHistorico() {
+            const historico = JSON.parse(localStorage.getItem('historico') || '[]');
+            const lista = document.getElementById('historicoLista');
+            lista.innerHTML = historico.reverse().map(item => `
+                <div class="historico-item">
+                    <strong>${item.elemento}</strong><br>
+                    ${Object.entries(item.comparacoes).map(([k, v]) => `${k}: ${v}`).join('<br>')}
+                </div>
+            `).join('');
+        }
+
+
+        // Jogo
+        function iniciarJogo() {
+            const elementoInput = document.getElementById('elementoInput');
+            const resultadoDiv = document.getElementById('resultado');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            errorDiv.textContent = '';
+            resultadoDiv.innerHTML = '';
+            
+            const simboloFormatado = formatarSimbolo(elementoInput.value);
+            
+            if (!elementos[simboloFormatado]) {
+                errorDiv.textContent = 'Elemento não encontrado!';
+                elementoInput.value = '';
+                return;
+            }
+
+            const elementoDiario = elementos[obterElementoDiario()];
+            const elementoEscolhido = elementos[simboloFormatado];
+            
+            const comparacoes = {
+                Grupo: elementoEscolhido.grupo === elementoDiario.grupo ? "✅ Correto --- " + elementoDiario.grupo : "❌ Errado",
+                Período: elementoEscolhido.periodo === elementoDiario.periodo ? "✅ Correto --- " + elementoDiario.periodo : "❌ Errado",
+                Família: elementoEscolhido.familia === elementoDiario.familia ? "✅ Correto --- " + elementoDiario.familia : "❌ Errado",
+                Eletronegatividade: compararNumeros(elementoEscolhido.eletronegatividade, elementoDiario.eletronegatividade),
+                "Número Atômico": compararNumeros(elementoEscolhido.Natomico, elementoDiario.Natomico)
+            };
+
+            let resultadoHTML = `<h3>Seu chute: ${elementoEscolhido.nome}</h3>`;
+            resultadoHTML += Object.entries(comparacoes).map(([k, v]) => 
+                `<p><strong>${k}:</strong> ${v}</p>`
+            ).join('');
+
+            const acertouTudo = Object.values(comparacoes).every(v => v.includes("✅") || v.includes("Igual"));
+            
+            if (acertouTudo) {
+                gerarNovoElemento()
+                resultadoHTML += `<h3 style="color: green; font-weight: bold;">🎉 PARABÉNS! O elemento correto era: ${elementoDiario.nome}</h3>`;
+            } else {
+                resultadoHTML += `<h3 style="color: red;">Tente de novo</h3>`;
+                atualizarHistorico(elementoEscolhido, comparacoes);
+            }
+
+            elementoInput.value = '';
+            resultadoDiv.innerHTML = resultadoHTML;
+        }
+
+        // Inicialização
+        window.onload = () => {
+            criarTabelaPeriodica();
+            exibirHistorico();
+        };
+    </script>
+</body>
+</html>

@@ -163,53 +163,87 @@
 
         /* Responsivo para telas menores */
         @media (max-width: 900px) {
-            .container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0;
-            }
-            #instructionsPanel, #historico {
-                margin-bottom: 15px;
-                width: 100%;
-                min-width: 0;
-                max-width: 100%;
-            }
-            .main-content {
-                margin-bottom: 15px;
-            }
-            .tabela-periodica {
-                max-width: 100vw;
-                font-size: 13px;
-            }
-        }
+    .container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+    }
+    #instructionsPanel, #historico {
+        margin-bottom: 15px;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+    .main-content {
+        margin-bottom: 15px;
+    }
+    .tabela-periodica {
+        max-width: 100vw;
+        font-size: 13px;
+        overflow-x: auto;
+    }
+}
 
-        @media (max-width: 600px) {
-            body {
-                padding: 5px;
-            }
-            #gamePanel, #historico, #instructionsPanel {
-                padding: 15px;
-                border-radius: 10px;
-            }
-            .tabela-periodica {
-                gap: 2px;
-                margin: 10px 0;
-                font-size: 12px;
-            }
-            .elemento {
-                font-size: 12px;
-                min-width: 16px;
-                max-width: 30px;
-                padding: 4px 0;
-            }
-            h1 {
-                font-size: 1.2em;
-                padding-right: 0;
-            }
-            #historico, #instructionsPanel {
-                max-height: 200px;
-            }
-        }
+@media (max-width: 700px) {
+    .container {
+        padding: 0;
+        gap: 0;
+    }
+    #instructionsPanel {
+        display: none !important; /* Esconde instruções em telas pequenas */
+    }
+    #historico {
+        max-width: 100vw;
+        min-width: 0;
+        width: 100%;
+        padding: 10px;
+        font-size: 13px;
+        max-height: 180px;
+    }
+    #gamePanel {
+        max-width: 100vw;
+        min-width: 0;
+        width: 100%;
+        padding: 10px;
+    }
+    .main-content {
+        margin-bottom: 10px;
+    }
+    .tabela-periodica {
+        margin: 10px 0 0 0;
+        font-size: 11px;
+        gap: 1.5px;
+        max-width: 100vw;
+        overflow-x: auto;
+    }
+    .elemento {
+        font-size: 11px;
+        min-width: 14px;
+        max-width: 22px;
+        padding: 3px 0;
+    }
+    h1 {
+        font-size: 1.1em;
+        padding-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .tabela-periodica {
+        font-size: 9px;
+        gap: 1px;
+    }
+    .elemento {
+        font-size: 9px;
+        min-width: 10px;
+        max-width: 16px;
+        padding: 2px 0;
+    }
+    #historico, #gamePanel {
+        padding: 5px;
+        font-size: 11px;
+    }
+}
     </style>
 </head>
 <body>

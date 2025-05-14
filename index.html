@@ -60,7 +60,7 @@
 
         #historico {
             width: 300px;
-            max-height: 500px;
+            max-height: 200px;
             overflow-y: auto;
             min-width: 180px;
             margin-left: 0px;
@@ -162,25 +162,26 @@
         }
 
         /* Responsivo para telas menores */
-        @media (max-width: 900px) {
+@media (max-width: 900px) {
     .container {
         flex-direction: column;
         align-items: stretch;
         gap: 0;
     }
-    #instructionsPanel, #historico {
-        margin-bottom: 15px;
-        width: 100%;
-        min-width: 0;
-        max-width: 100%;
+    #instructionsPanel {
+        display: none !important; /* Esconde instruções em telas menores */
+    }
+    #historico {
+    display: none !important; /* Esconde histórico em telas menores */
     }
     .main-content {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
     .tabela-periodica {
         max-width: 100vw;
         font-size: 13px;
         overflow-x: auto;
+        margin: 10px 0 0 0;
     }
 }
 
@@ -190,27 +191,22 @@
         gap: 0;
     }
     #instructionsPanel {
-        display: none !important; /* Esconde instruções em telas pequenas */
+        display: none !important;
     }
     #historico {
-        max-width: 100vw;
-        min-width: 0;
-        width: 100%;
-        padding: 10px;
-        font-size: 13px;
-        max-height: 180px;
+        display: none !important;
     }
     #gamePanel {
         max-width: 100vw;
         min-width: 0;
         width: 100%;
-        padding: 10px;
+        padding: 8px;
     }
     .main-content {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     .tabela-periodica {
-        margin: 10px 0 0 0;
+        margin: 8px 0 0 0;
         font-size: 11px;
         gap: 1.5px;
         max-width: 100vw;
@@ -240,8 +236,11 @@
         padding: 2px 0;
     }
     #historico, #gamePanel {
-        padding: 5px;
-        font-size: 11px;
+        padding: 4px;
+        font-size: 10px;
+    }
+    #historico {
+        display: none !important; /* Esconde histórico em telas menores */
     }
 }
     </style>

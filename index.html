@@ -105,12 +105,15 @@
             grid-template-columns: repeat(18, minmax(22px, 1fr));
             gap: 5px;
             margin: 25px 0;
-            justify-content: center;
+            justify-content: flex-start; /* Alinha a tabela à esquerda para garantir a primeira coluna visível */
             width: 100%;
             max-width: 950px;
             overflow-x: auto;
             margin-top: 30px;
             margin-bottom: 0px;
+            box-sizing: border-box;
+            padding-left: 0;
+            padding-right: 0;
         }
 
         .elemento {
@@ -178,10 +181,14 @@
         margin-bottom: 10px;
     }
     .tabela-periodica {
-        max-width: 110vw;
-        font-size: 13px;
+        max-width: 100vw;
+        min-width: 650px;
         overflow-x: auto;
-        margin: 5px 0 0 0;
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: 50px;
+        margin-right: 0;
+        justify-content: flex-start; /* Garante que a tabela comece do lado esquerdo */
     }
 }
 
@@ -206,11 +213,14 @@
         margin-bottom: 8px;
     }
     .tabela-periodica {
-        margin: 4px 0 0 0;
-        font-size: 11px;
-        gap: 1.5px;
-        max-width: 110vw;
+        max-width: 100vw;
+        min-width: 650px;
         overflow-x: auto;
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: 50px;
+        margin-right: 0;
+        justify-content: flex-start; /* Garante que a tabela comece do lado esquerdo */
     }
     .elemento {
         font-size: 11px;

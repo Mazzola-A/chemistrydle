@@ -18,7 +18,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            min-height: 120vh;
             box-sizing: border-box;
         }
 
@@ -43,9 +43,9 @@
             justify-content: flex-start;
         }
 
-        #gamePanel, #historico, #instructionsPanel {
+        #gamePanel, #historico {
             background-color: #2c3e50;
-            padding: 30px;
+            padding: 15px;
             border-radius: 15px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
             margin-bottom: 0px;
@@ -66,13 +66,6 @@
             margin-left: 0px;
         }
         
-        #instructionsPanel {
-            width: 250px;
-            min-width: 160px;
-            text-align: left;
-            margin-right: 0px;
-        }
-        
         input {
             padding: 12px;
             font-size: 16px;
@@ -82,6 +75,19 @@
             width: 80%;
             max-width: 220px;
             box-sizing: border-box;
+        }
+        .instructButton {
+            padding: 12px 12px;
+            font-size: 25px;
+            cursor: pointer;
+            background-color: #2c3e50;
+            color: rgb(241, 241, 241);
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .instructButton:hover {
+            background-color: #c0c0c0;
         }
 
         button {
@@ -161,6 +167,46 @@
             word-break: break-word;
         }
 
+        .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #2c3e50;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+    }
+
+    .close-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #197e1d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .close-button:hover {
+      background-color: #0f5c13;
+    }
+
         /* Responsivo para telas menores */
 @media (max-width: 950px) {
     .container {
@@ -168,9 +214,7 @@
         align-items: stretch;
         gap: 0;
     }
-    #instructionsPanel {
-        display: none !important; /* Esconde instruções em telas menores */
-    }
+
     #historico {
     display: none !important; /* Esconde histórico em telas menores */
     }
@@ -192,9 +236,7 @@
         padding: 0;
         gap: 0;
     }
-    #instructionsPanel {
-        display: none !important;
-    }
+
     #historico {
         display: none !important;
     }
@@ -250,28 +292,22 @@
 </head>
 <body>
     <h1 style="color: white; font-weight: bold; padding-right: 70px;">🔬Chemistrydle</h1>
-    
     <div class="container">
-        <div id="instructionsPanel">
-            <h2 style="color: white;">📋 Instruções</h2>
-            <p style="color: white;">Digite um elemento até acertar, quando acertar ele mudará e você terá que acertar de novo. Jogue bastante e fique craque na tabela periódica!!!</p>
-        </div>
         <div class="main-content">
             <div id="gamePanel">
+                <button class="instructButton" onclick="openHelp()">📋</button>
                 <input type="text" id="elementoInput" placeholder="Digite o símbolo">
                 <button onclick="iniciarJogo()">Enviar</button>
                 <div style="color: white;" id="resultado"></div>
                 <div id="errorMessage" class="error"></div>
             </div>
-            
-            
-        </div>
-
+        
         <div id="historico">
             <h2 style="color: white;">📝 Tentativas</h2>
             <div style="color: white;" id="historicoLista"></div>
         </div>
     </div>
+        </div>  
 
     <div style="overflow-x:auto;width:100%;" class="tabela-periodica">
         <div class="elemento" id="1">H</div>
@@ -535,6 +571,35 @@
         };
 
         // Funções auxiliares
+
+        function openHelp() {
+      // Criar o elemento da janela modal
+      const modalOverlay = document.createElement('div');
+      modalOverlay.className = 'modal-overlay';
+
+      // Conteúdo da janela
+      modalOverlay.innerHTML = `
+        <div class="modal-content" style="color: white;">
+          <h2>Instruções do Jogo</h2>
+          <p>Bem-vindo ao Chemistrydle! Aqui estão as instruções:</p>
+            <p style="text-align: left;">Existe um elemento misterioso que precisa ser descoberto.</p>
+            <p style="text-align: left;">Você tentara acertar qual é digitando sua sigla na barra de resposta.</p>
+            <p style="text-align: left;">Assim que você enviar seu chute, será mostrado características desse elemento como dicas para te ajudar.</p>
+            <p style="text-align: left;">As características são: Grupo, Período, Subcamada de valência, Eletronegatividade e Número Atômico.</p>
+            <p style="text-align: center;">Boa sorte!</p>
+          <button class="close-button">Fechar</button>
+        </div>
+      `;
+
+      // Adicionar a janela ao corpo do documento
+      document.body.appendChild(modalOverlay);
+
+      // Adicionar evento ao botão de fechar
+      modalOverlay.querySelector('.close-button').addEventListener('click', () => {
+        document.body.removeChild(modalOverlay);
+      });
+    }
+
         function formatarSimbolo(simbolo) {
             return simbolo.charAt(0).toUpperCase() + simbolo.slice(1).toLowerCase();
         }

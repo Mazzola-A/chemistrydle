@@ -260,7 +260,7 @@
         max-width: 100vw;
         min-width: 0;
         width: 100%;
-        padding: 8px;
+        padding: 0px;
     }
     .main-content {
         margin-bottom: 8px;
@@ -706,6 +706,32 @@
 
         // Funções auxiliares
 
+        function openInfoModal(simbolo) {
+    const elemento = elementos[simbolo];
+    if (!elemento || !elemento.info) return;
+
+    // Criar o elemento da janela modal
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'modal-overlay';
+
+    // Conteúdo da janela
+    modalOverlay.innerHTML = `
+        <div class="modal-content" style="color: white;">
+            <h2>${elemento.nome}</h2>
+            <p style="text-align: left;">${elemento.info}</p>
+            <button class="close-button">Fechar</button>
+        </div>
+    `;
+
+    // Adicionar a janela ao corpo do documento
+    document.body.appendChild(modalOverlay);
+
+    // Adicionar evento ao botão de fechar
+    modalOverlay.querySelector('.close-button').addEventListener('click', () => {
+        document.body.removeChild(modalOverlay);
+    });
+}
+
         function openHelp() {
       // Criar o elemento da janela modal
       const modalOverlay = document.createElement('div');
@@ -725,7 +751,6 @@
           <button class="close-button">Fechar</button>
         </div>
       `;
-
       function openInfoModal(simbolo) {
     const elemento = elementos[simbolo];
     if (!elemento || !elemento.info) return;
@@ -903,15 +928,23 @@ function compararNumeros(chute, correto) {
             const acertouTudo = Object.values(comparacoes).every(v => v.includes("✅") || v.includes("Igual"));
             
             if (acertouTudo) {
-                gerarNovoElemento()
-                resultadoHTML += `<h3 style="color: green; font-weight: bold;">🎉 PARABÉNS! O elemento correto era: ${elementoDiario.nome}</h3>`;
+                    resultadoHTML += `<h3 style="color: green; font-weight: bold;">🎉 PARABÉNS! O elemento correto era: ${elementoDiario.nome}</h3>`;
                 // Remove a classe 'elemento-errado' de todos os elementos antes de aplicar
-                document.querySelectorAll('.elemento').forEach(el => el.classList.remove('elemento-errado'));
-                    // Limpa o histórico ao acertar
+                    document.querySelectorAll('.elemento').forEach(el => el.classList.remove('elemento-errado'));
+                // Limpa o histórico ao acertar
                     localStorage.removeItem('historico');
                     exibirHistorico();
-                    // Onda verde na tabela periódica
+                // Onda verde na tabela periódica
                     ondaVerdeTabelaPeriodica();
+                // Abrir o modal de info do elemento correto
+                    setTimeout(() => {
+                    openInfoModal(obterElementoDiario());
+                    },700); // espera o efeito verde
+                    
+                // Só depois de tudo, gera um novo elemento
+                    setTimeout(() => {
+                    gerarNovoElemento();
+                    }, 800); // espera o efeito verde e o modal abrir
             } else {
                 resultadoHTML += `<h3 style="color: red;">Tente de novo</h3>`;
                 atualizarHistorico(elementoEscolhido, comparacoes);

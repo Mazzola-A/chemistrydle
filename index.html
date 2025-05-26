@@ -56,7 +56,7 @@
 
         #gamePanel {
             min-width: 220px;
-            max-width: 320px;
+            max-width: 220px;
             flex: 0 0 220px;
             margin: 0;
         }
@@ -64,7 +64,7 @@
         #historico {
             min-width: 180px;
             max-width: 350px;
-            flex: 0 0 180px;
+            flex: 0 0 220px;
             margin: 0;
             max-height: 500px;
             overflow-y: auto;
@@ -104,6 +104,7 @@
             border-radius: 8px;
             transition: background-color 0.3s;
             margin-top: 10px;
+            margin-left: 13px;
         }
 
         button:hover {
@@ -221,6 +222,10 @@
         min-width: 650px;
         max-width: 100vw;
     }
+        button {
+        width: 100%;
+        display: flex;
+    }
 }
 
 @media (max-width: 900px) {
@@ -233,6 +238,10 @@
         min-width: 0;
         width: 100%;
         margin-bottom: 10px;
+    }
+    button {
+        width: 100%;
+        display: flex;
     }
     #historico {
     display: none !important; /* Esconde histórico em telas menores */
@@ -257,10 +266,34 @@
         display: none !important;
     }
     #gamePanel {
-        max-width: 100vw;
-        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+        .input-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
         width: 100%;
-        padding: 0px;
+        margin: 0;
+    }
+        #elementoInput {
+        flex: 1 1 auto;
+        margin: 0;
+        max-width: none;
+    }
+    #gamePanel button,
+    #gamePanel .instructButton {
+        margin: 0;
+        width: auto;
+        min-width: 60px;
+        padding: 10px 8px;
+        font-size: 1em;
+    }
+        button {
+        width: 100%;
+        display: flex;
     }
     .main-content {
         margin-bottom: 8px;
@@ -310,14 +343,14 @@
     <h1 style="color: white; font-weight: bold; padding-right: 70px;">🧪Chemistrydle</h1>
 <div class="container">
             <div id="gamePanel">
-                <button class="instructButton" onclick="openHelp()">📋</button>
-                <button onclick="iniciarJogo()" style="margin-left: 25px;">Enviar</button>
-                <input type="text" id="elementoInput" placeholder="Digite o símbolo">
+            <div class="input-row">
+                    <button class="instructButton" onclick="openHelp()">📋</button>
+                    <button onclick="iniciarJogo()">Enviar</button>
+                    <input type="text" id="elementoInput" placeholder="Digite o símbolo">
+                </div>
                 <div style="color: white;" id="resultado"></div>
                 <div id="errorMessage" class="error"></div>
             </div>
-     
-
     <div style="overflow-x:auto;">
         <div class="tabela-periodica">
         <div class="elemento" id="1">H</div>
@@ -459,7 +492,7 @@
         </div>
     </div>
             <div id="historico">
-            <h2 style="color: white;">📝 Tentativas</h2>
+            <h2 style="color: white;">📝 Tentativas <span id="contadorTentativas" style="color: white;"></span></h2>
             <div style="color: white;" id="historicoLista"></div>
             </div>
 </div>
@@ -682,7 +715,7 @@
                 info:"Curiosidade: Nomeado em honra a Niels Bohr, pai do modelo atômico quântico. Utilidade: Estudos sobre a estrutura eletrônica de elementos superpesados." },
             "Hs": { nome: "Hássio", grupo: "8", periodo: "7", familia: "D", eletronegatividade: null, Natomico: 108,
                 info:"Curiosidade: Seu nome vem de Hesse, estado alemão onde fica o laboratório GSI (local de sua síntese). Utilidade: Investigação de isótopos exóticos e reações de fissão nuclear." },
-            "Mt": { nome: "Meitnério", grupo: "9", periodo: "7", familia: "D", eletronegatividade: null, Natomico: 109,
+            "Mt": { nome: "Moscóvio", grupo: "9", periodo: "7", familia: "D", eletronegatividade: null, Natomico: 109,
                 info:"Curiosidade: Homenageia Lise Meitner, física que explicou a fissão nuclear. Utilidade: Pesquisas sobre a formação de elementos em supernovas." },
             "Ds": { nome: "Darmstádio", grupo: "10", periodo: "7", familia: "D", eletronegatividade: null, Natomico: 110,
                 info:"Curiosidade: Nomeado em referência a Darmstadt (Alemanha), sede do GSI. Utilidade: Estudo da teoria da ilha de estabilidade (núcleos superpesados estáveis)." },
@@ -876,7 +909,7 @@ function compararNumeros(chute, correto) {
                 elemento: elemento.nome,
                 comparacoes: comparacoes
             });
-            localStorage.setItem('historico', JSON.stringify(historico.slice(-5)));
+            localStorage.setItem('historico', JSON.stringify(historico.slice(-118)));
             exibirHistorico();
         }
 
@@ -889,6 +922,9 @@ function compararNumeros(chute, correto) {
                     ${Object.entries(item.comparacoes).map(([k, v]) => `${k}: ${v}`).join('<br>')}
                 </div>
             `).join('');
+        // Atualiza o contador de tentativas
+            const contador = document.getElementById('contadorTentativas');
+            if (contador) contador.textContent = `- ${historico.length}`;
         }
 
 

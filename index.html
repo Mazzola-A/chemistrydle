@@ -130,7 +130,7 @@
             text-align: center;
             font-size: 16px;
             background-color: #0d1822;
-            border: 1px solid #7a7a7a;
+            border: 1px solid #4b4b4b;
             cursor: pointer;
             transition: all 0.3s;
             border-radius: 4px;
@@ -500,6 +500,7 @@
         <div class="elemento" id="103"style="grid-column: 18; grid-row: 11;">Lr</div>
         </div>
     </div>
+
             <div id="historico">
             <h2 style="color: white;">📝 Tentativas <span id="contadorTentativas" style="color: white;"></span></h2>
             <div style="color: white;" id="historicoLista"></div>
@@ -745,9 +746,26 @@
             "Og": { nome: "Oganessônio", grupo: "18", periodo: "7", familia: "P", eletronegatividade: null, Natomico: 118,
                 info:"Curiosidade: Único elemento nomeado em homenagem a um cientista vivo (Yuri Oganessian). Utilidade: Estudo de gases nobres superpesados e possíveis reações químicas inéditas." }
         };
-
+        let pontuacao = 100;
         // Funções auxiliares
 
+        // Salva e carrega a pontuação do localStorage
+    function salvarPontuacao(valor) {
+    pontuacao = Math.max(0, Math.min(100, valor));
+    localStorage.setItem('pontuacao', pontuacao);
+    atualizarPontuacao();
+    }
+    function carregarPontuacao() {
+    pontuacao = Number(localStorage.getItem('pontuacao')) || 100;
+    atualizarPontuacao();
+    }
+
+        // Atualiza o valor na tela
+    function atualizarPontuacao() {
+    const el = document.getElementById('pontuacao');
+    if (el) el.textContent = pontuacao;
+    }
+        
         function openInfoModal(simbolo) {
     const elemento = elementos[simbolo];
     if (!elemento || !elemento.info) return;
@@ -939,73 +957,69 @@ function compararNumeros(chute, correto) {
 
         // Jogo
         function iniciarJogo() {
-            const elementoInput = document.getElementById('elementoInput');
-            const resultadoDiv = document.getElementById('resultado');
-            const errorDiv = document.getElementById('errorMessage');
-            
-            errorDiv.textContent = '';
-            resultadoDiv.innerHTML = '';
-            
-            const simboloFormatado = formatarSimbolo(elementoInput.value);
-            
-            if (!elementos[simboloFormatado]) {
-                errorDiv.textContent = 'Elemento não encontrado!';
-                elementoInput.value = '';
-                return;
-            }
+    const elementoInput = document.getElementById('elementoInput');
+    const resultadoDiv = document.getElementById('resultado');
+    const errorDiv = document.getElementById('errorMessage');
+    
+    errorDiv.textContent = '';
+    resultadoDiv.innerHTML = '';
+    
+    const simboloFormatado = formatarSimbolo(elementoInput.value);
+    
+    if (!elementos[simboloFormatado]) {
+        errorDiv.textContent = 'Elemento não encontrado!';
+        elementoInput.value = '';
+        return;
+    }
 
-            const elementoDiario = elementos[obterElementoDiario()];
-            const elementoEscolhido = elementos[simboloFormatado];
-            
-            const comparacoes = {
-                Grupo: elementoEscolhido.grupo === elementoDiario.grupo ? "✅ Correto --- " + elementoDiario.grupo : "❌ Errado",
-                Período: elementoEscolhido.periodo === elementoDiario.periodo ? "✅ Correto --- " + elementoDiario.periodo : "❌ Errado",
-                "Subcamada de valência": elementoEscolhido.familia === elementoDiario.familia ? "✅ Correto --- " + elementoDiario.familia : "❌ Errado",
-                Eletronegatividade: compararNumeros(elementoEscolhido.eletronegatividade, elementoDiario.eletronegatividade),
-                "Número Atômico": compararNumeros(elementoEscolhido.Natomico, elementoDiario.Natomico)
-            };
+    const elementoDiario = elementos[obterElementoDiario()];
+    const elementoEscolhido = elementos[simboloFormatado];
+    
+    const comparacoes = {
+        Grupo: elementoEscolhido.grupo === elementoDiario.grupo ? "✅ Correto --- " + elementoDiario.grupo : "❌ Errado",
+        Período: elementoEscolhido.periodo === elementoDiario.periodo ? "✅ Correto --- " + elementoDiario.periodo : "❌ Errado",
+        "Subcamada de valência": elementoEscolhido.familia === elementoDiario.familia ? "✅ Correto --- " + elementoDiario.familia : "❌ Errado",
+        Eletronegatividade: compararNumeros(elementoEscolhido.eletronegatividade, elementoDiario.eletronegatividade),
+        "Número Atômico": compararNumeros(elementoEscolhido.Natomico, elementoDiario.Natomico)
+    };
 
-            let resultadoHTML = `<h3>Seu chute: ${elementoEscolhido.nome}</h3>`;
-            resultadoHTML += Object.entries(comparacoes).map(([k, v]) => 
-                `<p><strong>${k}:</strong> ${v}</p>`
-            ).join('');
+    let resultadoHTML = `<h3>Seu chute: ${elementoEscolhido.nome}</h3>`;
+    resultadoHTML += Object.entries(comparacoes).map(([k, v]) => 
+        `<p><strong>${k}:</strong> ${v}</p>`
+    ).join('');
 
-            const acertouTudo = Object.values(comparacoes).every(v => v.includes("✅") || v.includes("Igual"));
-            
-            if (acertouTudo) {
-                    resultadoHTML += `<h3 style="color: green; font-weight: bold;">🎉 PARABÉNS! O elemento correto era: ${elementoDiario.nome}</h3>`;
-                // Remove a classe 'elemento-errado' de todos os elementos antes de aplicar
-                    document.querySelectorAll('.elemento').forEach(el => el.classList.remove('elemento-errado'));
-                // Limpa o histórico ao acertar
-                    localStorage.removeItem('historico');
-                    exibirHistorico();
-                // Onda verde na tabela periódica
-                    ondaVerdeTabelaPeriodica();
-                // Abrir o modal de info do elemento correto
-                    setTimeout(() => {
-                    openInfoModal(obterElementoDiario());
-                    },700); // espera o efeito verde
-                    
-                // Só depois de tudo, gera um novo elemento
-                    setTimeout(() => {
-                    gerarNovoElemento();
-                    }, 800); // espera o efeito verde e o modal abrir
-            } else {
-                resultadoHTML += `<h3 style="color: red;">Tente de novo</h3>`;
-                atualizarHistorico(elementoEscolhido, comparacoes);
-                
-                // Destacar o elemento errado na tabela periódica
-                destacarElementoErrado(elementoEscolhido.Natomico);
-            }
+    const acertouTudo = Object.values(comparacoes).every(v => v.includes("✅") || v.includes("Igual"));
+    
+    if (acertouTudo) {
+        resultadoHTML += `<h3 style="color: green; font-weight: bold;">🎉 PARABÉNS! O elemento correto era: ${elementoDiario.nome}. <p style="color: white">⭐Pontuação: ${pontuacao}</p></h3>`;
+        document.querySelectorAll('.elemento').forEach(el => el.classList.remove('elemento-errado'));
+        localStorage.removeItem('historico');
+        exibirHistorico();
+        ondaVerdeTabelaPeriodica();
+        setTimeout(() => {
+            openInfoModal(obterElementoDiario());
+        },700);
+        setTimeout(() => {
+            gerarNovoElemento();
+            salvarPontuacao(100); // Reseta a pontuação para 100 ao acertar
+        }, 800);
+    } else {
+        resultadoHTML += `<h3 style="color: red;">Tente de novo</h3>`;
+        atualizarHistorico(elementoEscolhido, comparacoes);
+        destacarElementoErrado(elementoEscolhido.Natomico);
+        // Diminui a pontuação a cada tentativa errada (exemplo: -15 pontos, mínimo 0)
+        salvarPontuacao(pontuacao - 5);
+    }
 
-            elementoInput.value = '';
-            resultadoDiv.innerHTML = resultadoHTML;
-        }
+    elementoInput.value = '';
+    resultadoDiv.innerHTML = resultadoHTML;
+}
 
         // Inicialização
-        window.onload = () => {
-            criarTabelaPeriodica();
-            exibirHistorico();
+    window.onload = () => {
+        criarTabelaPeriodica();
+        exibirHistorico();
+        carregarPontuacao();
         };
         openHelp()
     </script>

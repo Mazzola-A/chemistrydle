@@ -926,7 +926,18 @@ function compararNumeros(chute, correto) {
     if (chute === correto) {
         return "✅ Igual";
     }
-    return chute > correto ? "⬇️ Menor" : "⬆️ Maior";
+        const diff = Math.abs(chute - correto);
+    if (diff === 1) {
+        return chute > correto ? "⬇️ Menor - 🔥 Pelando!" : "⬆️ Maior - 🔥 Pelando!";
+    } else if (diff === 2) {
+        return chute > correto ? "⬇️ Menor - ♨️ Quente" : "⬆️ Maior - ♨️ Quente";
+    } else if (diff === 3) {
+        return chute > correto ? "⬇️ Menor - 🌡️ Morno" : "⬆️ Maior - 🌡️ Morno";
+    } else if (diff === 4) {
+        return chute > correto ? "⬇️ Menor - 🧊 Frio" : "⬆️ Maior - 🧊 Frio";
+    } else {
+        return chute > correto ? "⬇️ Menor - ❄️ Congelando" : "⬆️ Maior - ❄️ Congelando";
+    }
 }
 
         // Histórico
